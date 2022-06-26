@@ -4,6 +4,7 @@ import styled from "styled-components";
 import socketService from "./services/socketService";
 import { JoinRoom } from "./components/joinRoom";
 import GameContext, { IGameContextProps } from "./contexts/gameContext";
+import { Game } from "./components/game";
 
 const AppContainer = styled.div`
   width: 100%;
@@ -29,6 +30,7 @@ const MainContainer = styled.div`
 
 function App() {
   const [isInRoom, setInRoom] = useState(false);
+  const [playerSymbol, setPlayerSymbol] = useState<"x" | "o">("x");
   const connectSocket = async () => {
     const socket = await socketService.connect("http://localhost:9000").catch((err) => {
       console.log("Error: ", err);
@@ -42,13 +44,16 @@ function App() {
   const gameContextValue: IGameContextProps = {
     isInRoom,
     setInRoom,
+    playerSymbol,
+    setPlayerSymbol,
   };
   return (
     <GameContext.Provider value={gameContextValue}>
       <AppContainer>
         <WelcomeText>Welcome to {import.meta.env.VITE_GAME_TITLE}</WelcomeText>
         <MainContainer>
-          <JoinRoom />
+          {!isInRoom && <JoinRoom />}
+          {isInRoom && <Game />}
         </MainContainer>
       </AppContainer>
     </GameContext.Provider>
