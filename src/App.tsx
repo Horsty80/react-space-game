@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-// import logo from "./logo.svg";
 import "./App.css";
 import styled from "styled-components";
-import { io } from "socket.io-client";
 import socketService from "./services/socketService";
+import { JoinRoom } from "./components/joinRoom";
+import GameContext, { IGameContextProps } from "./contexts/gameContext";
 
 const AppContainer = styled.div`
   width: 100%;
@@ -28,6 +28,7 @@ const MainContainer = styled.div`
 `;
 
 function App() {
+  const [isInRoom, setInRoom] = useState(false);
   const connectSocket = async () => {
     const socket = await socketService.connect("http://localhost:9000").catch((err) => {
       console.log("Error: ", err);
@@ -37,12 +38,20 @@ function App() {
   useEffect(() => {
     connectSocket();
   }, []);
-  
+
+  const gameContextValue: IGameContextProps = {
+    isInRoom,
+    setInRoom,
+  };
   return (
-    <AppContainer>
-      <WelcomeText>Welcome to {import.meta.env.VITE_GAME_TITLE}</WelcomeText>
-      <MainContainer>Hey</MainContainer>
-    </AppContainer>
+    <GameContext.Provider value={gameContextValue}>
+      <AppContainer>
+        <WelcomeText>Welcome to {import.meta.env.VITE_GAME_TITLE}</WelcomeText>
+        <MainContainer>
+          <JoinRoom />
+        </MainContainer>
+      </AppContainer>
+    </GameContext.Provider>
   );
 }
 

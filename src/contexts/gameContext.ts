@@ -1,7 +1,13 @@
 import { createContext } from "react";
 
-export interface IGameContextProps {}
+export interface IGameContextProps {
+  isInRoom: boolean;
+  setInRoom: (inRoom: boolean) => void;
+}
 
-const defaultState: IGameContextProps = {};
+const defaultState: IGameContextProps = {
+  isInRoom: false,
+  setInRoom: () => {},
+};
 
-export default createContext({});
+export default createContext(defaultState);
