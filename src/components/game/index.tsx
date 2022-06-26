@@ -1,6 +1,8 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import gameContext from "../../contexts/gameContext";
+import gameService from "../../services/gameService";
+import socketService from "../../services/socketService";
 
 const GameContainer = styled.div`
   display: flex;
@@ -74,6 +76,8 @@ export function Game() {
     [null, null, null],
   ]);
 
+  const { playerSymbol } = useContext(gameContext);
+
   const updateGameMatrix = (column: number, row: number, symbol: "x" | "o") => {
     const newMatrix = [...matrix];
 
@@ -81,13 +85,22 @@ export function Game() {
       newMatrix[row][column] = symbol;
       setMatrix(newMatrix);
     }
-
-
-
-    
+    if (socketService.socket) {
+      gameService.updateGame(socketService.socket, newMatrix);
+    }
   };
 
-  const { playerSymbol } = useContext(gameContext);
+  const handleGameUpdate = () => {
+    if (socketService.socket) {
+      gameService.onGameUpdate(socketService.socket, (newMatrix) => {
+        setMatrix(newMatrix);
+      });
+    }
+  };
+
+  useEffect(() => {
+    handleGameUpdate();
+  }, []);
 
   return (
     <GameContainer>
