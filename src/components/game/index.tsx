@@ -68,6 +68,11 @@ const O = styled.span`
 `;
 
 export type IPlayMatrix = Array<Array<"x" | "o" | "null" | null>>;
+export interface IStartGame {
+  start: boolean;
+  symbol: "x" | "o";
+}
+
 export function Game() {
   // each array represents row
   const [matrix, setMatrix] = useState<IPlayMatrix>([
@@ -76,7 +81,14 @@ export function Game() {
     [null, null, null],
   ]);
 
-  const { playerSymbol } = useContext(gameContext);
+  const {
+    playerSymbol,
+    setPlayerSymbol,
+    setPlayerTurn,
+    isPlayerTurn,
+    setGameStarted,
+    isGameStarted,
+  } = useContext(gameContext);
 
   const updateGameMatrix = (column: number, row: number, symbol: "x" | "o") => {
     const newMatrix = [...matrix];
@@ -85,8 +97,10 @@ export function Game() {
       newMatrix[row][column] = symbol;
       setMatrix(newMatrix);
     }
+
     if (socketService.socket) {
       gameService.updateGame(socketService.socket, newMatrix);
+      setPlayerTurn(false);
     }
   };
 
@@ -94,16 +108,30 @@ export function Game() {
     if (socketService.socket) {
       gameService.onGameUpdate(socketService.socket, (newMatrix) => {
         setMatrix(newMatrix);
+        setPlayerTurn(true);
       });
     }
   };
 
+  const handleGameStart = () => {
+    if (socketService.socket) {
+      gameService.onStartGame(socketService.socket, (options) => {
+        setGameStarted(true);
+        setPlayerSymbol(options.symbol);
+        if (options.start) setPlayerTurn(true);
+        else setPlayerTurn(false);
+      });
+    }
+  };
   useEffect(() => {
     handleGameUpdate();
+    handleGameStart();
   }, []);
 
   return (
     <GameContainer>
+      {!isGameStarted && <h2>Waiting for Other Player to Join to Start the Game!</h2>}
+      {(!isGameStarted || !isPlayerTurn) && <PlayStopper />}
       {matrix.map((row, rowIndex) => {
         return (
           <RowContainer>
