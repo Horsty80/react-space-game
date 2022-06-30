@@ -34,12 +34,13 @@ function App() {
   const [isPlayerTurn, setPlayerTurn] = useState(false);
   const [isGameStarted, setGameStarted] = useState(false);
   const connectSocket = async () => {
-    const wsTarget = `ws://${
-      import.meta.env.PROD ? "horsty-room-server-game.herokuapp.com" : "localhost:9000"
-    }`;
-    const socket = await socketService.connect(wsTarget).catch((err) => {
-      console.log("Error: ", err);
-    });
+    console.log(import.meta.env.PROD);
+    const wsTarget = import.meta.env.PROD ? "wss://horsty-room-server-game.herokuapp.com" : "ws://localhost:9000"
+    const socket = await socketService
+      .connect(wsTarget)
+      .catch((err) => {
+        console.log("Error: ", err);
+      });
   };
 
   useEffect(() => {
