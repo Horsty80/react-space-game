@@ -202,9 +202,10 @@ export function Game() {
       {(!isGameStarted || !isPlayerTurn) && <PlayStopper />}
       {matrix.map((row, rowIndex) => {
         return (
-          <RowContainer>
+          <RowContainer key={`row-${rowIndex}`}>
             {row.map((column, columnIndex) => (
               <Cell
+                key={`cell-${rowIndex}-${columnIndex}`}
                 borderRight={columnIndex > 2}
                 borderLeft={columnIndex > 0}
                 borderBottom={rowIndex < 2}
