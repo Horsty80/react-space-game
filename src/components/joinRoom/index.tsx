@@ -79,6 +79,8 @@ export function JoinRoom(props: IJoinRoomProps) {
     <form onSubmit={joinRoom}>
       <JoinRoomContainer>
         <h4>Enter Room ID to Join the Game</h4>
+        or
+        <h4>Create your own Room ID</h4>
         <RoomIdInput placeholder="Room ID" value={roomName} onChange={handleRoomNameChange} />
         <JoinButton type="submit" disabled={isJoining}>
           {isJoining ? "Joining..." : "Join"}
